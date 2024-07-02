@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Busca de Usuários</title>
+</head>
+<body>
+    <h1>Busca de Usuários</h1>
+    <form action="/search" method="post">
+        <input type="text" name="search_query" placeholder="Digite o nome">
+        <input type="submit" value="Buscar">
+    </form>
+
+    {% if results %}
+        <ul>
+            {% for user in results %}
+                <li>{{ user[1] }} - {{ user[2] }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
+
