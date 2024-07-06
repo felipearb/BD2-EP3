@@ -21,7 +21,7 @@ def get_db_connection():
     )
     return conn
 
-def init_db():
+def init_tables():
     create_tables_sql = """
     CREATE SCHEMA IF NOT EXISTS mydb;
 
@@ -138,6 +138,9 @@ def init_db():
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
     );
+
+
+
     """
     conn = get_db_connection()
     cur = conn.cursor()
@@ -146,6 +149,35 @@ def init_db():
     cur.close()
     conn.close()
 
+def init_values():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # SQL para inserir médicos apenas se não existirem
+    insert_sql = """
+    INSERT INTO medico (crm, nomeM, telefoneM, percentual)
+    SELECT * FROM (VALUES
+        ('CRM001', 'Dr. João Silva', '12345678901', 10.00),
+        ('CRM002', 'Dra. Maria Oliveira', '12345678902', 12.50),
+        ('CRM003', 'Dr. Pedro Santos', '12345678903', 15.00),
+        ('CRM004', 'Dra. Ana Lima', '12345678904', 8.75),
+        ('CRM005', 'Dr. Lucas Costa', '12345678905', 11.00),
+        ('CRM006', 'Dra. Fernanda Souza', '12345678906', 14.25),
+        ('CRM007', 'Dr. Marcos Ribeiro', '12345678907', 9.50),
+        ('CRM008', 'Dra. Carla Almeida', '12345678908', 13.75),
+        ('CRM009', 'Dr. Paulo Mendes', '12345678909', 10.50),
+        ('CRM010', 'Dra. Laura Azevedo', '12345678910', 16.00)
+    ) AS data(crm, nomeM, telefoneM, percentual)
+    WHERE NOT EXISTS (
+        SELECT 1 FROM medico WHERE medico.crm = data.crm
+    );
+    """
+    
+    cur.execute(insert_sql)
+    conn.commit()
+    
+    cur.close()
+    conn.close()
 
 @app.route('/')
 def index():
@@ -156,6 +188,19 @@ def search():
     search_query = request.form['search_query']
     conn = get_db_connection()
     cur = conn.cursor()
+    cur.execute("SELECT * FROM medico WHERE nomeM ILIKE %s", ('%' + search_query + '%',))
+    results = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('index.html', results=results)
+
+
+
+@app.route('/searchall', methods=['POST'])
+def searchall():
+    search_query = request.form['search_query']
+    conn = get_db_connection()
+    cur = conn.cursor()
     cur.execute("SELECT * FROM medico")
     results = cur.fetchall()
     cur.close()
@@ -163,5 +208,6 @@ def search():
     return render_template('index.html', results=results)
 
 if __name__ == '__main__':
-    init_db()
+    init_tables()
+    init_values()
     app.run(debug=True)

@@ -12,4 +12,3 @@ dist/
 .pytest_cache/
 
 # Ignore config.ini
-config.ini
