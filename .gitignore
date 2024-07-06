@@ -1,0 +1,15 @@
+# Byte-compiled / optimized Python files
+__pycache__/
+*.py[cod]
+
+# CPython
+*.pyc
+
+# PyInstaller
+dist/
+
+# pytest
+.pytest_cache/
+
+# Ignore config.ini
+config.ini
