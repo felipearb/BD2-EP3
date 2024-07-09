@@ -12,34 +12,16 @@
         <input type="text" name="search_query" placeholder="Digite o nome">
         <input type="submit" value="Buscar">
     </form>
-
-    <!-- Formulário para buscar todos os médicos -->
     <form action="/searchall" method="post">
-        <input type="hidden" name="search_query" value="all">
-        <input type="submit" value="Mostrar Todos">
+        <input type="submit" value="Listar Todos os Médicos">
     </form>
-
-    {% if results %}
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Telefone</th>
-                    <th>Percentual</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for medico in results %}
-                    <tr>
-                        <td>{{ medico[0] }}</td>
-                        <td>{{ medico[1] }}</td>
-                        <td>{{ medico[2] }}</td>
-                        <td>{{ medico[3] }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-</body>
-</html>
+    <form action="/list_consultas_paciente_medico" method="get">
+        <input type="submit" value="Listar Consultas (Diego Pituca com Dr. House)">
+    </form>
+    <form action="/list_medicos_uma_especialidade" method="get">
+        <input type="submit" value="Listar Médicos (Dermatologia)">
+    </form>
+    <form action="/list_medicos_todas_especialidades" method="get">
+        <input type="submit" value="Listar Médicos (Todas Especialidades)">
+    </form>
+    <form action="/list_pacientes_medico_especialidade"

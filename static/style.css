@@ -1,12 +1,26 @@
+/* Estilos para a tabela */
 table {
-    border-collapse: collapse;
     width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
 }
-th, td {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
-}
+
+/* Estilos para as células do cabeçalho */
 th {
     background-color: #f2f2f2;
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+/* Estilos para as células de dados */
+td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+/* Estilo para linhas alternadas (opcional) */
+tr:nth-child(even) {
+    background-color: #f9f9f9;
 }
