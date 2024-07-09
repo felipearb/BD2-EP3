@@ -179,10 +179,10 @@ def init_values():
     cur.close()
     conn.close()
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -198,6 +198,7 @@ def search():
     conn.close()
     return render_template('index.html', results=results)
 
+
 @app.route('/searchall', methods=['POST'])
 def searchall():
     conn = get_db_connection()
@@ -208,65 +209,46 @@ def searchall():
     conn.close()
     return render_template('index.html', results=results)
 
-# Funções para executar as consultas SQL fornecidas
-@app.route('/list_consultas_paciente_medico', methods=['GET'])
+
+@app.route('/list_consultas_paciente_medico', methods=['POST'])
 def list_consultas_paciente_medico():
+    crm = request.form['crm']
+    idPac = request.form['idPac']
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
         SELECT crm, idPac, idEsp, data, horaInicCon
         FROM consulta
-        WHERE idPac = (SELECT idPac FROM paciente WHERE nomeP = 'Diego Pituca')
-        AND crm = (SELECT crm FROM medico WHERE nomeM = 'Dr. House')
-    """)
+        WHERE crm = %s AND idPac = %s
+    """, (crm, idPac))
     results = cur.fetchall()
     cur.close()
     conn.close()
     return render_template('index.html', results=results)
 
-@app.route('/list_medicos_uma_especialidade', methods=['GET'])
+
+@app.route('/list_medicos_uma_especialidade', methods=['POST'])
 def list_medicos_uma_especialidade():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT m.crm, m.nomeM
-        FROM medico m, exerceEsp p
-        WHERE m.crm = p.crm
-        AND p.idEsp = 'Dermatologia'
-        AND p.crm NOT IN (
-            SELECT crm
-            FROM exerceEsp
-            WHERE idEsp <> 'Dermatologia'
-        )
-    """)
-    results = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('index.html', results=results)
-
-@app.route('/list_medicos_todas_especialidades', methods=['GET'])
-def list_medicos_todas_especialidades():
+    especialidade = request.form['especialidade']
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
         SELECT m.crm, m.nomeM
         FROM medico m
-        WHERE (
-            SELECT COUNT(DISTINCT idEsp)
-            FROM exerceEsp ee
-            WHERE ee.crm = m.crm
-        ) = (
-            SELECT COUNT(*)
-            FROM especialidade
-        )
-    """)
+        JOIN exerceEsp e ON m.crm = e.crm
+        JOIN especialidade esp ON e.idEsp = esp.idEsp
+        WHERE esp.nomeE = %s
+    """, (especialidade,))
     results = cur.fetchall()
     cur.close()
     conn.close()
     return render_template('index.html', results=results)
 
-@app.route('/list_pacientes_medico_especialidade', methods=['GET'])
+
+@app.route('/list_pacientes_medico_especialidade', methods=['POST'])
 def list_pacientes_medico_especialidade():
+    medico = request.form['medico']
+    especialidade = request.form['especialidade']
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
@@ -274,69 +256,49 @@ def list_pacientes_medico_especialidade():
         FROM consulta c
         JOIN paciente p ON c.idPac = p.idPac
         JOIN medico m ON c.crm = m.crm
-        WHERE m.nomeM = 'Dr. House'
-        AND c.idEsp = 'Cardiologista'
-    """)
+        JOIN especialidade e ON c.idEsp = e.idEsp
+        WHERE m.nomeM = %s AND e.nomeE = %s
+    """, (medico, especialidade))
     results = cur.fetchall()
     cur.close()
     conn.close()
     return render_template('index.html', results=results)
 
-@app.route('/list_medicos_todos_dias', methods=['GET'])
-def list_medicos_todos_dias():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT m.nomeM
-        FROM medico m
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM (
-                SELECT DISTINCT diaSemana
-                FROM agenda
-            ) dias_semana
-            WHERE NOT EXISTS (
-                SELECT 1
-                FROM agenda a
-                WHERE a.crm = m.crm AND a.diaSemana = dias_semana.diaSemana
-            )
-        )
-    """)
-    results = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('index.html', results=results)
 
-@app.route('/list_consultas_janeiro', methods=['GET'])
+@app.route('/list_consultas_janeiro', methods=['POST'])
 def list_consultas_janeiro():
+    mes = request.form['mes']
+    ano = request.form['ano']
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
-        SELECT c.crm AS IdMedico, c.idPac AS IdPaciente, c.idEsp AS IdEspecialidade, c.data AS Data, c.horaInicCon AS HoraInicCon
-        FROM consulta c
-        WHERE YEAR(c.data) = 2024
-        AND MONTH(c.data) = 1
-    """)
+        SELECT crm, idPac, idEsp, data, horaInicCon
+        FROM consulta
+        WHERE EXTRACT(MONTH FROM data) = %s AND EXTRACT(YEAR FROM data) = %s
+    """, (mes, ano))
     results = cur.fetchall()
     cur.close()
     conn.close()
     return render_template('index.html', results=results)
 
-@app.route('/total_consultas_medico', methods=['GET'])
+
+@app.route('/total_consultas_medico', methods=['POST'])
 def total_consultas_medico():
+    nomeM = request.form['nomeM']
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
         SELECT c.idEsp, COUNT(c.idCon) AS TotalConsultas
         FROM consulta c
         JOIN medico m ON c.crm = m.crm
-        WHERE m.nomeM = 'Dr. House'
+        WHERE m.nomeM = %s
         GROUP BY c.idEsp
-    """)
+    """, (nomeM,))
     results = cur.fetchall()
     cur.close()
     conn.close()
     return render_template('index.html', results=results)
+
 
 @app.route('/medico_menos_consultas', methods=['GET'])
 def medico_menos_consultas():
@@ -355,6 +317,7 @@ def medico_menos_consultas():
     conn.close()
     return render_template('index.html', results=results)
 
+
 @app.route('/remover_consultas_nao_pagas', methods=['POST'])
 def remover_consultas_nao_pagas():
     conn = get_db_connection()
@@ -366,7 +329,21 @@ def remover_consultas_nao_pagas():
     conn.commit()
     cur.close()
     conn.close()
-    return "Consultas não pagas removidas com sucesso!", 200
+    
+    # Recuperando consultas removidas
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT COUNT(*) AS consultas_removidas
+        FROM consulta
+        WHERE pagou = 'N'
+    """)
+    results_remove = cur.fetchone()
+    cur.close()
+    conn.close()
+    
+    return render_template('index.html', results_remove=results_remove)
+
 
 @app.route('/transferir_consulta', methods=['POST'])
 def transferir_consulta():
@@ -384,11 +361,26 @@ def transferir_consulta():
     conn.commit()
     cur.close()
     conn.close()
-    return "Consulta transferida com sucesso!", 200
+    
+    # Verificando se a consulta foi transferida
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT COUNT(*) AS consultas_transferidas
+        FROM consulta
+        WHERE crm = (SELECT crm FROM medico WHERE nomeM = 'Dr. Kildare')
+            AND data = '2024-05-24'
+            AND idPac = (SELECT idPac FROM paciente WHERE nomeP = 'Diego Pituca')
+    """)
+    results_transfer = cur.fetchone()
+    cur.close()
+    conn.close()
+    
+    return render_template('index.html', results_transfer=results_transfer)
+
+
 
 if __name__ == '__main__':
     init_tables()
     init_values()
     app.run(debug=True)
-
-

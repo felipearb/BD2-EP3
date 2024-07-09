@@ -1,27 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Busca de Usuários</title>
+    <title>Consultas Médicas</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Busca de Usuários</h1>
+    <h1>Consultas Médicas</h1>
+
+    <h2>Listar Consultas de um Paciente por Médico</h2>
+    <form action="/list_consultas_paciente_medico" method="post">
+        <label for="crm">CRM:</label>
+        <input type="text" id="crm" name="crm" required>
+        <label for="idPac">ID Paciente:</label>
+        <input type="text" id="idPac" name="idPac" required>
+        <button type="submit">Buscar Consultas</button>
+    </form>
+
+    <h2>Listar Médicos de uma Especialidade</h2>
+    <form action="/list_medicos_uma_especialidade" method="post">
+        <label for="especialidade">Especialidade:</label>
+        <input type="text" id="especialidade" name="especialidade" required>
+        <button type="submit">Buscar Médicos</button>
+    </form>
+
+    <h2>Listar Pacientes de um Médico por Especialidade</h2>
+    <form action="/list_pacientes_medico_especialidade" method="post">
+        <label for="medico">Nome do Médico:</label>
+        <input type="text" id="medico" name="medico" required>
+        <label for="especialidade_paciente">Especialidade:</label>
+        <input type="text" id="especialidade_paciente" name="especialidade" required>
+        <button type="submit">Buscar Pacientes</button>
+    </form>
+
+    <h2>Listar Consultas em um Mês e Ano</h2>
+    <form action="/list_consultas_janeiro" method="post">
+        <label for="mes">Mês:</label>
+        <input type="text" id="mes" name="mes" required>
+        <label for="ano">Ano:</label>
+        <input type="text" id="ano" name="ano" required>
+        <button type="submit">Buscar Consultas</button>
+    </form>
+
+    <h2>Total de Consultas por Médico</h2>
+    <form action="/total_consultas_medico" method="post">
+        <label for="nomeM">Nome do Médico:</label>
+        <input type="text" id="nomeM" name="nomeM" required>
+        <button type="submit">Buscar Total de Consultas</button>
+    </form>
+
+    <h2>Médico com Menos Consultas</h2>
+    <form action="/medico_menos_consultas" method="get">
+        <button type="submit">Buscar Médico</button>
+    </form>
+
+    <h2>Remover Consultas Não Pagas</h2>
+    <form action="/remover_consultas_nao_pagas" method="post">
+        <button type="submit">Remover Consultas</button>
+    </form>
+
+    <h2>Transferir Consulta</h2>
+    <form action="/transferir_consulta" method="post">
+        <button type="submit">Transferir Consulta</button>
+    </form>
+
+    <h2>Buscar Médico por Nome</h2>
     <form action="/search" method="post">
-        <input type="text" name="search_query" placeholder="Digite o nome">
-        <input type="submit" value="Buscar">
+        <label for="search_query">Nome do Médico:</label>
+        <input type="text" id="search_query" name="search_query" required>
+        <button type="submit">Buscar</button>
     </form>
+
+    <h2>Listar Todos os Médicos</h2>
     <form action="/searchall" method="post">
-        <input type="submit" value="Listar Todos os Médicos">
+        <button type="submit">Listar Todos</button>
     </form>
-    <form action="/list_consultas_paciente_medico" method="get">
-        <input type="submit" value="Listar Consultas (Diego Pituca com Dr. House)">
-    </form>
-    <form action="/list_medicos_uma_especialidade" method="get">
-        <input type="submit" value="Listar Médicos (Dermatologia)">
-    </form>
-    <form action="/list_medicos_todas_especialidades" method="get">
-        <input type="submit" value="Listar Médicos (Todas Especialidades)">
-    </form>
-    <form action="/list_pacientes_medico_especialidade"
+
+    <h1>resultado das consultas</h1>
+
+    <div id="resultado">
+        {% if results %}
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in results[0].keys() %}
+                            <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in results %}
+                        <tr>
+                            {% for value in row %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Nenhum resultado encontrado.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>
