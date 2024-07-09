@@ -429,7 +429,7 @@ def medico_menos_consultas():
     results = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('index.html', results=results, columns=["crm","nome","medico", "TotalConsultas"])
+    return render_template('index.html', results=results, columns=["crm","nome", "TotalConsultas"])
 
 
 @app.route('/remover_consultas_nao_pagas', methods=['POST'])

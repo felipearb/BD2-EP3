@@ -2,101 +2,200 @@
 <html>
 <head>
     <title>Consultas Médicas</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .hidden {
+            display: none;
+        }
+        .section-divider {
+            margin: 40px 0;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            var sections = document.getElementsByClassName('section');
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].classList.add('hidden');
+            }
+            // Show the selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+    </script>
 </head>
 <body>
-    <h1>Consultas Médicas</h1>
+    <div class="container">
+        <h1 class="my-4 text-center">Consultas Médicas</h1>
 
-    <h2>Listar Consultas de um Paciente por Médico</h2>
-    <form action="/list_consultas_paciente_medico" method="post">
-        <label for="crm">CRM:</label>
-        <input type="text" id="crm" name="crm" required>
-        <label for="idPac">ID Paciente:</label>
-        <input type="text" id="idPac" name="idPac" required>
-        <button type="submit">Buscar Consultas</button>
-    </form>
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <button class="btn btn-primary btn-block" onclick="showSection('listar_consultas')">Listar Consultas de um Paciente por Médico</button>
+            </div>
+            <div class="col-md-6 mb-2">
+                <button class="btn btn-primary btn-block" onclick="showSection('listar_medicos')">Listar Médicos de uma Especialidade</button>
+            </div>
+            <div class="col-md-6 mb-2">
+                <button class="btn btn-primary btn-block" onclick="showSection('listar_pacientes')">Listar Pacientes de um Médico por Especialidade</button>
+            </div>
+            <div class="col-md-6 mb-2">
+                <button class="btn btn-primary btn-block" onclick="showSection('listar_consultas_mes')">Listar Consultas em um Mês e Ano</button>
+            </div>
+            <div class="col-md-6 mb-2">
+                <button class="btn btn-primary btn-block" onclick="showSection('total_consultas_medico')">Total de Consultas por Médico</button>
+            </div>
+            <div class="col-md-6 mb-2">
+                <button class="btn btn-primary btn-block" onclick="showSection('medico_menos_consultas')">Médico com Menos Consultas</button>
+            </div>
+            <div class="col-md-6 mb-2">
+                <button class="btn btn-primary btn-block" onclick="showSection('remover_consultas')">Remover Consultas Não Pagas</button>
+            </div>
+            <div class="col-md-6 mb-2">
+                <button class="btn btn-primary btn-block" onclick="showSection('transferir_consulta')">Transferir Consulta</button>
+            </div>
+            <div class="col-md-6 mb-2">
+                <button class="btn btn-primary btn-block" onclick="showSection('buscar_medico')">Buscar Médico por Nome</button>
+            </div>
+            <div class="col-md-6 mb-2">
+                <button class="btn btn-primary btn-block" onclick="showSection('listar_todos_medicos')">Listar Todos os Médicos</button>
+            </div>
+        </div>
 
-    <h2>Listar Médicos de uma Especialidade</h2>
-    <form action="/list_medicos_uma_especialidade" method="post">
-        <label for="especialidade">Especialidade:</label>
-        <input type="text" id="especialidade" name="especialidade" required>
-        <button type="submit">Buscar Médicos</button>
-    </form>
+        <div class="section-divider"></div>
 
-    <h2>Listar Pacientes de um Médico por Especialidade</h2>
-    <form action="/list_pacientes_medico_especialidade" method="post">
-        <label for="medico">Nome do Médico:</label>
-        <input type="text" id="medico" name="medico" required>
-        <label for="especialidade_paciente">Especialidade:</label>
-        <input type="text" id="especialidade_paciente" name="especialidade" required>
-        <button type="submit">Buscar Pacientes</button>
-    </form>
+        <div id="listar_consultas" class="section hidden my-4">
+            <h2>Listar Consultas de um Paciente por Médico</h2>
+            <form action="/list_consultas_paciente_medico" method="post" class="form-inline">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="crm" class="sr-only">CRM</label>
+                    <input type="text" id="crm" name="crm" class="form-control" placeholder="CRM" required>
+                </div>
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="idPac" class="sr-only">ID Paciente</label>
+                    <input type="text" id="idPac" name="idPac" class="form-control" placeholder="ID Paciente" required>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Buscar Consultas</button>
+            </form>
+        </div>
 
-    <h2>Listar Consultas em um Mês e Ano</h2>
-    <form action="/list_consultas_janeiro" method="post">
-        <label for="mes">Mês:</label>
-        <input type="text" id="mes" name="mes" required>
-        <label for="ano">Ano:</label>
-        <input type="text" id="ano" name="ano" required>
-        <button type="submit">Buscar Consultas</button>
-    </form>
+        <div id="listar_medicos" class="section hidden my-4">
+            <h2>Listar Médicos de uma Especialidade</h2>
+            <form action="/list_medicos_uma_especialidade" method="post" class="form-inline">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="especialidade" class="sr-only">Especialidade</label>
+                    <input type="text" id="especialidade" name="especialidade" class="form-control" placeholder="Especialidade" required>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Buscar Médicos</button>
+            </form>
+        </div>
 
-    <h2>Total de Consultas por Médico</h2>
-    <form action="/total_consultas_medico" method="post">
-        <label for="nomeM">Nome do Médico:</label>
-        <input type="text" id="nomeM" name="nomeM" required>
-        <button type="submit">Buscar Total de Consultas</button>
-    </form>
+        <div id="listar_pacientes" class="section hidden my-4">
+            <h2>Listar Pacientes de um Médico por Especialidade</h2>
+            <form action="/list_pacientes_medico_especialidade" method="post" class="form-inline">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="medico" class="sr-only">Nome do Médico</label>
+                    <input type="text" id="medico" name="medico" class="form-control" placeholder="Nome do Médico" required>
+                </div>
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="especialidade_paciente" class="sr-only">Especialidade</label>
+                    <input type="text" id="especialidade_paciente" name="especialidade" class="form-control" placeholder="Especialidade" required>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Buscar Pacientes</button>
+            </form>
+        </div>
 
-    <h2>Médico com Menos Consultas</h2>
-    <form action="/medico_menos_consultas" method="get">
-        <button type="submit">Buscar Médico</button>
-    </form>
+        <div id="listar_consultas_mes" class="section hidden my-4">
+            <h2>Listar Consultas em um Mês e Ano</h2>
+            <form action="/list_consultas_janeiro" method="post" class="form-inline">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="mes" class="sr-only">Mês</label>
+                    <input type="text" id="mes" name="mes" class="form-control" placeholder="Mês" required>
+                </div>
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="ano" class="sr-only">Ano</label>
+                    <input type="text" id="ano" name="ano" class="form-control" placeholder="Ano" required>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Buscar Consultas</button>
+            </form>
+        </div>
 
-    <h2>Remover Consultas Não Pagas</h2>
-    <form action="/remover_consultas_nao_pagas" method="post">
-        <button type="submit">Remover Consultas</button>
-    </form>
+        <div id="total_consultas_medico" class="section hidden my-4">
+            <h2>Total de Consultas por Médico</h2>
+            <form action="/total_consultas_medico" method="post" class="form-inline">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="nomeM" class="sr-only">Nome do Médico</label>
+                    <input type="text" id="nomeM" name="nomeM" class="form-control" placeholder="Nome do Médico" required>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Buscar Total de Consultas</button>
+            </form>
+        </div>
 
-    <h2>Transferir Consulta</h2>
-    <form action="/transferir_consulta" method="post">
-        <button type="submit">Transferir Consulta</button>
-    </form>
+        <div id="medico_menos_consultas" class="section hidden my-4">
+            <h2>Médico com Menos Consultas</h2>
+            <form action="/medico_menos_consultas" method="get" class="form-inline">
+                <button type="submit" class="btn btn-primary mb-2">Buscar Médico</button>
+            </form>
+        </div>
 
-    <h2>Buscar Médico por Nome</h2>
-    <form action="/search" method="post">
-        <label for="search_query">Nome do Médico:</label>
-        <input type="text" id="search_query" name="search_query" required>
-        <button type="submit">Buscar</button>
-    </form>
+        <div id="remover_consultas" class="section hidden my-4">
+            <h2>Remover Consultas Não Pagas</h2>
+            <form action="/remover_consultas_nao_pagas" method="post" class="form-inline">
+                <button type="submit" class="btn btn-danger mb-2">Remover Consultas</button>
+            </form>
+        </div>
 
-    <h2>Listar Todos os Médicos</h2>
-    <form action="/searchall" method="post">
-        <button type="submit">Listar Todos</button>
-    </form>
+        <div id="transferir_consulta" class="section hidden my-4">
+            <h2>Transferir Consulta</h2>
+            <form action="/transferir_consulta" method="post" class="form-inline">
+                <button type="submit" class="btn btn-warning mb-2">Transferir Consulta</button>
+            </form>
+        </div>
 
-    <h1>resultado das consultas</h1>
+        <div id="buscar_medico" class="section hidden my-4">
+            <h2>Buscar Médico por Nome</h2>
+            <form action="/search" method="post" class="form-inline">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="search_query" class="sr-only">Nome do Médico</label>
+                    <input type="text" id="search_query" name="search_query" class="form-control" placeholder="Nome do Médico" required>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Buscar</button>
+            </form>
+        </div>
 
-    <div class="results">
-        <table>
-            <thead>
-                <tr>
-                    {% for column in columns%}
-                        <th>{{ column }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in results%}
+        <div id="listar_todos_medicos" class="section hidden my-4">
+            <h2>Listar Todos os Médicos</h2>
+            <form action="/searchall" method="post" class="form-inline">
+                <button type="submit" class="btn btn-primary mb-2">Listar Todos</button>
+            </form>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h1 class="my-4 text-center">Resultado das Consultas</h1>
+        <div class="results table-responsive">
+            <table class="table table-bordered">
+                <thead class="thead-light">
                     <tr>
-                        {% for cell in row %}
-                            <td>{{ cell }}</td>
+                        {% for column in columns %}
+                            <th>{{ column }}</th>
                         {% endfor %}
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for row in results %}
+                        <tr>
+                            {% for cell in row %}
+                                <td>{{ cell }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>
