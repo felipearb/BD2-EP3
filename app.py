@@ -310,7 +310,7 @@ def search():
     results = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('index.html', results=results, columns=["crm", "nomeM", "telefoneM", "percentual"])
+    return render_template('index.html', results=results, columns=["CRM", "Nome", "Telefone", "Percentual(%)"])
 
 
 @app.route('/searchall', methods=['POST'])
@@ -321,7 +321,7 @@ def searchall():
     results = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('index.html', results=results,columns=["crm", "nomeM", "telefoneM", "percentual"])
+    return render_template('index.html', results=results,columns=["CRM", "Nome", "Telefone", "Percentual(%)"])
 
 
 @app.route('/list_consultas_paciente_medico', methods=['POST'])
@@ -338,7 +338,7 @@ def list_consultas_paciente_medico():
     results = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('index.html', results=results, columns=["crm", "idPac", "idEsp", "data", "horaInicCon"])
+    return render_template('index.html', results=results, columns=["CRM", "id do paciente", "id da especialização", "data", "hora de inicio da consulta"])
 
 
 @app.route('/list_medicos_uma_especialidade', methods=['POST'])
@@ -356,7 +356,7 @@ def list_medicos_uma_especialidade():
     results = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('index.html', results=results, columns=["crm","nome"])
+    return render_template('index.html', results=results, columns=["CRM","nome"])
 
 
 @app.route('/list_pacientes_medico_especialidade', methods=['POST'])
@@ -376,7 +376,7 @@ def list_pacientes_medico_especialidade():
     results = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('index.html', results=results, columns=["cpf","nome"])
+    return render_template('index.html', results=results, columns=["CPF","nome"])
 
 
 @app.route('/list_consultas_janeiro', methods=['POST'])
@@ -393,7 +393,7 @@ def list_consultas_janeiro():
     results = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('index.html', results=results, columns=["crm","idPaciente","idEspecialiazação","data","horario inicio"])
+    return render_template('index.html', results=results, columns=["CRM", "id do paciente", "id da especialização", "data", "hora de inicio da consulta"])
 
 
 @app.route('/total_consultas_medico', methods=['POST'])
@@ -411,7 +411,7 @@ def total_consultas_medico():
     results = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('index.html', results=results, columns=["id_especialização","quantidade"])
+    return render_template('index.html', results=results, columns=["id da especialização","quantidade de consultas"])
 
 
 @app.route('/medico_menos_consultas', methods=['GET'])
@@ -429,7 +429,7 @@ def medico_menos_consultas():
     results = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('index.html', results=results, columns=["crm","nome", "TotalConsultas"])
+    return render_template('index.html', results=results, columns=["CRM","Nome", "Total de consultas"])
 
 
 @app.route('/remover_consultas_nao_pagas', methods=['POST'])

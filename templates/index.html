@@ -147,9 +147,36 @@
 
         <div id="transferir_consulta" class="section hidden my-4">
             <h2>Transferir Consulta</h2>
-            <form action="/transferir_consulta" method="post" class="form-inline">
-                <button type="submit" class="btn btn-warning mb-2">Transferir Consulta</button>
-            </form>
+            <div id="select_consulta">
+                <form action="/transferir_consulta" method="post" class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="medico" class="sr-only">Médico</label>
+                        <input type="text" id="medico" name="medico" class="form-control" placeholder="Nome do Médico" required>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="horario" class="sr-only">Horário</label>
+                        <input type="text" id="horario" name="horario" class="form-control" placeholder="Horário da Consulta" required>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="paciente" class="sr-only">Paciente</label>
+                        <input type="text" id="paciente" name="paciente" class="form-control" placeholder="Nome do Paciente" required>
+                    </div>
+                    <button type="button" onclick="showSection('confirmar_transferencia')" class="btn btn-warning mb-2">Próximo</button>
+                </form>
+            </div>
+            <div id="confirmar_transferencia" class="section hidden my-4">
+                <h3>Confirmação de Transferência</h3>
+                <p>Médico: <span id="confirm_medico"></span></p>
+                <p>Horário: <span id="confirm_horario"></span></p>
+                <p>Paciente: <span id="confirm_paciente"></span></p>
+                <form action="/confirmar_transferencia" method="post" class="form-inline">
+                    <input type="hidden" id="confirm_medico_input" name="confirm_medico">
+                    <input type="hidden" id="confirm_horario_input" name="confirm_horario">
+                    <input type="hidden" id="confirm_paciente_input" name="confirm_paciente">
+                    <button type="submit" class="btn btn-warning mb-2">Confirmar Transferência</button>
+                    <button type="button" onclick="showSection('select_consulta')" class="btn btn-secondary mb-2 ml-2">Voltar</button>
+                </form>
+            </div>
         </div>
 
         <div id="buscar_medico" class="section hidden my-4">
