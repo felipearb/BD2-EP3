@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import psycopg2
 from configparser import ConfigParser
+import time
 
 app = Flask(__name__)
 
@@ -152,9 +153,9 @@ def init_tables():
 def init_values():
     conn = get_db_connection()
     cur = conn.cursor()
-    
-    # SQL para inserir médicos apenas se não existirem
-    insert_sql = """
+
+    # Exemplo para inserir médicos apenas se não existirem
+    insert_medico_sql = """
     INSERT INTO medico (crm, nomeM, telefoneM, percentual)
     SELECT * FROM (VALUES
         ('CRM001', 'Dr. João Silva', '12345678901', 10.00),
@@ -173,11 +174,124 @@ def init_values():
     );
     """
     
-    cur.execute(insert_sql)
+    # Exemplo para inserir registros na tabela agenda
+    insert_agenda_sql = """
+    INSERT INTO agenda (diaSemana, horaInicio, horaFim, crm)
+    SELECT diaSemana, CAST(horaInicio AS TIME), CAST(horaFim AS TIME), crm FROM (
+        VALUES
+        ('Segunda', '08:00', '12:00', 'CRM001'),
+        ('Terça', '09:00', '13:00', 'CRM002'),
+        ('Quarta', '10:00', '14:00', 'CRM003'),
+        ('Quinta', '11:00', '15:00', 'CRM004'),
+        ('Sexta', '12:00', '16:00', 'CRM005'),
+        ('Sábado', '13:00', '17:00', 'CRM006'),
+        ('Domingo', '14:00', '18:00', 'CRM007'),
+        ('Segunda', '08:30', '12:30', 'CRM008'),
+        ('Terça', '09:30', '13:30', 'CRM009'),
+        ('Quarta', '10:30', '14:30', 'CRM010')
+    ) AS data(diaSemana, horaInicio, horaFim, crm)
+    WHERE NOT EXISTS (
+        SELECT 1 FROM agenda WHERE agenda.crm = data.crm
+    );
+    """
+    
+    # Exemplo para inserir registros na tabela especialidade
+    insert_especialidade_sql = """
+    INSERT INTO especialidade (nomeE, indice)
+    SELECT * FROM (VALUES
+        ('Cardiologia', 1),
+        ('Pediatria', 2),
+        ('Ortopedia', 3),
+        ('Dermatologia', 4),
+        ('Oftalmologia', 5),
+        ('Psiquiatria', 6),
+        ('Ginecologia', 7),
+        ('Urologia', 8),
+        ('Endocrinologia', 9),
+        ('Oncologia', 10)
+    ) AS data(nomeE, indice)
+    WHERE NOT EXISTS (
+        SELECT 1 FROM especialidade WHERE especialidade.nomeE = data.nomeE
+    );
+    """
+    
+    # Exemplo para inserir registros na tabela exerceEsp (relacionamento entre médico e especialidade)
+    insert_exerceEsp_sql = """
+    INSERT INTO exerceEsp (crm, idEsp)
+    SELECT * FROM (VALUES
+        ('CRM001', 1),
+        ('CRM002', 2),
+        ('CRM003', 3),
+        ('CRM004', 4),
+        ('CRM005', 5),
+        ('CRM006', 6),
+        ('CRM007', 7),
+        ('CRM008', 8),
+        ('CRM009', 9),
+        ('CRM010', 10)
+    ) AS data(crm, idEsp)
+    WHERE NOT EXISTS (
+        SELECT 1 FROM exerceEsp WHERE exerceEsp.crm = data.crm AND exerceEsp.idEsp = data.idEsp
+    );
+    """
+    
+    # Exemplo para inserir pacientes apenas se não existirem
+    insert_paciente_sql = """
+    INSERT INTO paciente (cpf, nomeP, telefonePac, endereco, idade, sexo)
+    SELECT * FROM (VALUES
+        ('CPF001', 'José da Silva', '21987654321', 'Rua A, 123', 40, 'M'),
+        ('CPF002', 'Maria Oliveira', '11976543210', 'Rua B, 456', 35, 'F'),
+        ('CPF003', 'Carlos Souza', '31965478901', 'Av. C, 789', 25, 'M'),
+        ('CPF004', 'Ana Lima', '41987654321', 'Rua D, 321', 30, 'F'),
+        ('CPF005', 'Paulo Mendes', '11965437890', 'Av. E, 654', 50, 'M'),
+        ('CPF006', 'Fernanda Santos', '21987654321', 'Rua F, 987', 45, 'F'),
+        ('CPF007', 'Pedro Ribeiro', '11987654321', 'Av. G, 123', 32, 'M'),
+        ('CPF008', 'Márcia Almeida', '21965437890', 'Rua H, 456', 28, 'F'),
+        ('CPF009', 'Luiza Costa', '11987654321', 'Av. I, 789', 55, 'F'),
+        ('CPF010', 'Rafaela Azevedo', '31965437890', 'Rua J, 987', 42, 'F')
+    ) AS data(cpf, nomeP, telefonePac, endereco, idade, sexo)
+    WHERE NOT EXISTS (
+        SELECT 1 FROM paciente WHERE paciente.cpf = data.cpf
+    );
+    """
+    
+    # Exemplo para inserir consultas apenas se não existirem
+    insert_consulta_sql = """
+    INSERT INTO consulta (crm, idEsp, idPac, data, horaInicCon, horaFimCon, pagou, valorPago, formaPagamento)
+    SELECT crm, idEsp, idPac, CAST(data AS DATE), CAST(horaInicCon AS TIME), CAST(horaFimCon AS TIME), pagou, valorPago, formaPagamento FROM (
+        VALUES
+        ('CRM001', 1, 1, '2024-07-10', '08:00', '09:00', 'S', 150.00, 'Dinheiro'),
+        ('CRM002', 2, 2, '2024-07-12', '09:00', '10:00', 'S', 200.00, 'Cartão'),
+        ('CRM003', 3, 3, '2024-07-15', '10:00', '11:00', 'S', 180.00, 'Dinheiro'),
+        ('CRM004', 4, 4, '2024-07-18', '11:00', '12:00', 'N', NULL, NULL),
+        ('CRM005', 5, 5, '2024-07-20', '12:00', '13:00', 'S', 190.00, 'Cartão'),
+        ('CRM006', 6, 6, '2024-07-22', '13:00', '14:00', 'S', 160.00, 'Dinheiro'),
+        ('CRM007', 7, 7, '2024-07-25', '14:00', '15:00', 'N', NULL, NULL),
+        ('CRM008', 8, 8, '2024-07-28', '15:00', '16:00', 'S', 220.00, 'Cartão'),
+        ('CRM009', 9, 9, '2024-07-30', '16:00', '17:00', 'S', 195.00, 'Dinheiro'),
+        ('CRM010', 10, 10, '2024-08-02', '17:00', '18:00', 'S', 180.00, 'Cartão')
+    ) AS data(crm, idEsp, idPac, data, horaInicCon, horaFimCon, pagou, valorPago, formaPagamento)
+    WHERE NOT EXISTS (
+        SELECT 1 FROM consulta WHERE consulta.crm = data.crm AND consulta.idEsp = data.idEsp AND consulta.idPac = data.idPac AND consulta.data = CAST(data.data AS DATE)
+    );
+    """
+    
+    # Executa os comandos SQL
+    cur.execute(insert_medico_sql)
+    cur.execute(insert_agenda_sql)
+    cur.execute(insert_especialidade_sql)
+    cur.execute(insert_exerceEsp_sql)
+    cur.execute(insert_paciente_sql)
+    cur.execute(insert_consulta_sql)
+    
+    # Commit para efetivar as transações no banco de dados
     conn.commit()
     
+    # Fecha o cursor e a conexão com o banco de dados
     cur.close()
     conn.close()
+
+
 
 @app.route('/')
 def index():
@@ -196,6 +310,7 @@ def search():
     results = cur.fetchall()
     cur.close()
     conn.close()
+    print(results)
     return render_template('index.html', results=results)
 
 
@@ -207,6 +322,11 @@ def searchall():
     results = cur.fetchall()
     cur.close()
     conn.close()
+    print(results)
+    for row in results:
+        print(row)
+    time.sleep(3)
+
     return render_template('index.html', results=results)
 
 
@@ -382,5 +502,5 @@ def transferir_consulta():
 
 if __name__ == '__main__':
     init_tables()
-    init_values()
+    #init_values()
     app.run(debug=True)

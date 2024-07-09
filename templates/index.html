@@ -77,29 +77,25 @@
 
     <h1>resultado das consultas</h1>
 
-    <div id="resultado">
-        {% if results %}
-            <table>
-                <thead>
+    <div class="results">
+        <table>
+            <thead>
+                <tr>
+                    {% for column in columns %}
+                        <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results %}
                     <tr>
-                        {% for column in results[0].keys() %}
-                            <th>{{ column }}</th>
+                        {% for cell in row %}
+                            <td>{{ cell }}</td>
                         {% endfor %}
                     </tr>
-                </thead>
-                <tbody>
-                    {% for row in results %}
-                        <tr>
-                            {% for value in row %}
-                                <td>{{ value }}</td>
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>Nenhum resultado encontrado.</p>
-        {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
 </body>
