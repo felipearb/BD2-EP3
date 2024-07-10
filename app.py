@@ -180,7 +180,8 @@ def init_values():
         ('CRM007', 'Dr. Marcos Ribeiro', '12345678907', 9.50),
         ('CRM008', 'Dra. Carla Almeida', '12345678908', 13.75),
         ('CRM009', 'Dr. Paulo Mendes', '12345678909', 10.50),
-        ('CRM010', 'Dra. Laura Azevedo', '12345678910', 16.00)
+        ('CRM010', 'Dra. Laura Azevedo', '12345678910', 16.00),
+        ('CRM011', 'Dr. Vitor Borges', '12345678911', 24.00)
     ) AS data(crm, nomeM, telefoneM, percentual)
     WHERE NOT EXISTS (
         SELECT 1 FROM medico WHERE medico.crm = data.crm
@@ -241,7 +242,8 @@ def init_values():
         ('CRM007', 7),
         ('CRM008', 8),
         ('CRM009', 9),
-        ('CRM010', 10)
+        ('CRM010', 10),
+        ('CRM011', 1)
     ) AS data(crm, idEsp)
     WHERE NOT EXISTS (
         SELECT 1 FROM exerceEsp WHERE exerceEsp.crm = data.crm AND exerceEsp.idEsp = data.idEsp
@@ -469,42 +471,7 @@ def remover_consultas_nao_pagas():
     cur.close()
     conn.close()
     
-    return render_template('index.html', results_remove=results_remove)
-
-
-@app.route('/transferir_consulta', methods=['POST'])
-def transferir_consulta():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        UPDATE consulta
-        SET crm = (SELECT crm FROM medico WHERE nomeM = 'Dr. Kildare'),
-            data = '2024-05-24'
-        WHERE idPac = (SELECT idPac FROM paciente WHERE nomeP = 'Diego Pituca')
-            AND data = '2024-05-10'
-            AND horaInicCon = '10:00:00'
-            AND idEsp = (SELECT idEsp FROM especialidade WHERE nomeE = 'Dermatologia')
-    """)
-    conn.commit()
-    cur.close()
-    conn.close()
-    
-    # Verificando se a consulta foi transferida
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT COUNT(*) AS consultas_transferidas
-        FROM consulta
-        WHERE crm = (SELECT crm FROM medico WHERE nomeM = 'Dr. Kildare')
-            AND data = '2024-05-24'
-            AND idPac = (SELECT idPac FROM paciente WHERE nomeP = 'Diego Pituca')
-    """)
-    results_transfer = cur.fetchone()
-    cur.close()
-    conn.close()
-    
-    return render_template('index.html', results_transfer=results_transfer)
-
+    return render_template('index.html', results=[["Consultas não pagas removidas"]])
 
 
 if __name__ == '__main__':
