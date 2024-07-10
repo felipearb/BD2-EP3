@@ -22,9 +22,22 @@ def get_db_connection():
     )
     return conn
 
+def drop_schema():
+    drop_schema_sql = """
+    DROP SCHEMA IF EXISTS public CASCADE;
+    CREATE SCHEMA public;
+    """
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(drop_schema_sql)
+    conn.commit()
+    cur.close()
+    conn.close()
+
 def init_tables():
     create_tables_sql = """
-    CREATE SCHEMA IF NOT EXISTS mydb;
+    CREATE SCHEMA IF NOT EXISTS public;
 
     CREATE TABLE IF NOT EXISTS medico (
         crm VARCHAR(10) NOT NULL,
@@ -48,9 +61,8 @@ def init_tables():
     );
 
     CREATE TABLE IF NOT EXISTS especialidade (
-        idEsp SERIAL PRIMARY KEY,
+        idEsp INT PRIMARY KEY,
         nomeE VARCHAR(45) NOT NULL,
-        indice INT NOT NULL,
         UNIQUE (nomeE)
     );
 
@@ -78,6 +90,7 @@ def init_tables():
         idade INT NOT NULL,
         sexo CHAR(1) NOT NULL
     );
+
 
     CREATE TABLE IF NOT EXISTS consulta (
         idCon SERIAL PRIMARY KEY,
@@ -197,7 +210,7 @@ def init_values():
     
     # Exemplo para inserir registros na tabela especialidade
     insert_especialidade_sql = """
-    INSERT INTO especialidade (nomeE, indice)
+    INSERT INTO especialidade (nomeE,idEsp)
     SELECT * FROM (VALUES
         ('Cardiologia', 1),
         ('Pediatria', 2),
@@ -280,8 +293,8 @@ def init_values():
     cur.execute(insert_medico_sql)
     cur.execute(insert_agenda_sql)
     cur.execute(insert_especialidade_sql)
-    cur.execute(insert_exerceEsp_sql)
     cur.execute(insert_paciente_sql)
+    cur.execute(insert_exerceEsp_sql)
     cur.execute(insert_consulta_sql)
     
     # Commit para efetivar as transações no banco de dados
@@ -495,6 +508,7 @@ def transferir_consulta():
 
 
 if __name__ == '__main__':
+    drop_schema()
     init_tables()
-    #init_values()
+    init_values()
     app.run(debug=True)
